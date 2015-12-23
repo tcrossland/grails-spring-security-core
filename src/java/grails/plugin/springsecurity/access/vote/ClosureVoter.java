@@ -1,4 +1,4 @@
-/* Copyright 2013-2015 SpringSource.
+/* Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,8 @@ public class ClosureVoter implements AccessDecisionVoter<FilterInvocation>, Appl
 		Assert.notNull(fi, "object cannot be null");
 		Assert.notNull(attributes, "attributes cannot be null");
 
+		log.trace("vote() Authentication {}, FilterInvocation {} ConfigAttributes {}", new Object[] { authentication, fi, attributes });
+
 		ClosureConfigAttribute attribute = null;
 		for (ConfigAttribute a : attributes) {
 			if (a instanceof ClosureConfigAttribute) {
@@ -52,6 +54,7 @@ public class ClosureVoter implements AccessDecisionVoter<FilterInvocation>, Appl
 		}
 
 		if (attribute == null) {
+			log.trace("No ClosureConfigAttribute found");
 			return ACCESS_ABSTAIN;
 		}
 
@@ -59,6 +62,7 @@ public class ClosureVoter implements AccessDecisionVoter<FilterInvocation>, Appl
 		closure.setDelegate(new SecuredClosureDelegate(authentication, fi, ctx));
 		Object result = closure.call();
 		if (result instanceof Boolean) {
+			log.trace("Closure result: {}", result);
 			return ((Boolean)result) ? ACCESS_GRANTED : ACCESS_DENIED;
 		}
 

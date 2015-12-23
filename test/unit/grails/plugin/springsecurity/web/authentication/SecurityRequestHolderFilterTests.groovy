@@ -1,4 +1,4 @@
-/* Copyright 2006-2015 SpringSource.
+/* Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 package grails.plugin.springsecurity.web.authentication
 
 import grails.plugin.springsecurity.web.SecurityRequestHolder
+import grails.plugin.springsecurity.web.SecurityRequestHolderFilter
 
 import javax.servlet.FilterChain
 
@@ -24,10 +25,9 @@ import org.springframework.mock.web.MockHttpServletResponse
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-class RequestHolderAuthenticationFilterTests extends GroovyTestCase {
+class SecurityRequestHolderFilterTests extends GroovyTestCase {
 
-	@SuppressWarnings('deprecation')
-	private RequestHolderAuthenticationFilter filter = new RequestHolderAuthenticationFilter()
+	private SecurityRequestHolderFilter filter = new SecurityRequestHolderFilter()
 
 	void testDoFilter() {
 		assert !SecurityRequestHolder.request

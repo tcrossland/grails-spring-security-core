@@ -1,4 +1,4 @@
-/* Copyright 2006-2015 SpringSource.
+/* Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,8 +70,8 @@ public class DigestAuthPasswordEncoder implements org.springframework.security.a
 	 * Called after the ApplicationContext is built to enable standard behavior.
 	 */
 	public void resetInitializing() {
-	   initializing = false;
-   }
+		initializing = false;
+	}
 
 	public void afterPropertiesSet() {
 		Assert.hasLength(realm, "realm is required");

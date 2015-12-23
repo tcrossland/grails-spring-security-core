@@ -1,4 +1,4 @@
-/* Copyright 2006-2015 SpringSource.
+/* Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,12 +193,13 @@ class ReflectionUtils {
 			}
 		}
 
+		log.trace 'Built ConfigAttributes {} for tokens {}', configAttributes, tokens
 		configAttributes
 	}
 
-    static String getGrailsServerURL() {
-        getApplication().config.grails.serverURL ? application.config?.grails?.serverURL?.toString() : null
-    }
+	static String getGrailsServerURL() {
+		getApplication().config.grails.serverURL ? application.config?.grails?.serverURL?.toString() : null
+	}
 
 	private static boolean supports(ConfigAttribute config, AccessDecisionVoter<?> voter) {
 		voter.supports(config)

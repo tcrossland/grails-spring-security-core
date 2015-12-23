@@ -1,4 +1,4 @@
-/* Copyright 2006-2015 SpringSource.
+/* Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import test.TestUserRoleGroup
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
 @TestMixin(IntegrationTestMixin)
-class GormUserDetailsServiceTests  {
+class GormUserDetailsServiceTests {
 
 	private static final String ADMIN_ROLE_NAME = 'ROLE_ADMIN'
 	private static final String SUPER_ADMIN_ROLE_NAME = 'ROLE_SUPERADMIN'
@@ -95,7 +95,7 @@ class GormUserDetailsServiceTests  {
 
 		assert !TestUser.count()
 		def user = new TestUser(loginName: loginName, passwrrd: password, enabld: enabled).save(failOnError: true)
-		assert  1 == TestUser.count()
+		assert 1 == TestUser.count()
 
 		TestUserRole.create user, adminRole
 		TestUserRole.create user, superAdminRole, true

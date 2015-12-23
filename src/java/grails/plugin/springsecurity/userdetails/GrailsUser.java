@@ -1,4 +1,4 @@
-/* Copyright 2006-2015 SpringSource.
+/* Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,8 +47,8 @@ public class GrailsUser extends User {
 	 * @param id the id of the domain class instance used to populate this
 	 */
 	public GrailsUser(String username, String password, boolean enabled, boolean accountNonExpired,
-         boolean credentialsNonExpired, boolean accountNonLocked,
-         Collection<GrantedAuthority> authorities, Object id) {
+	                  boolean credentialsNonExpired, boolean accountNonLocked,
+	                  Collection<GrantedAuthority> authorities, Object id) {
 		super(username, password, enabled, accountNonExpired, credentialsNonExpired,
 				accountNonLocked, authorities);
 		this.id = id;

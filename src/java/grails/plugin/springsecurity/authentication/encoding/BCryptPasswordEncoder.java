@@ -1,4 +1,4 @@
-/* Copyright 2013-2015 SpringSource.
+/* Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,12 +35,12 @@ public class BCryptPasswordEncoder implements org.springframework.security.authe
 	}
 
 	public String encodePassword(String rawPass, Object salt) {
-      checkSalt(salt);
+		checkSalt(salt);
 		return delegate.encode(rawPass);
 	}
 
 	public boolean isPasswordValid(String encPass, String rawPass, Object salt) {
-      checkSalt(salt);
+		checkSalt(salt);
 		return delegate.matches(rawPass, encPass);
 	}
 

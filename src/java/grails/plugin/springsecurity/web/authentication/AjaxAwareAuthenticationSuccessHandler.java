@@ -1,4 +1,4 @@
-/* Copyright 2006-2015 SpringSource.
+/* Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,12 @@ public class AjaxAwareAuthenticationSuccessHandler extends SavedRequestAwareAuth
 	@Override
 	public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response,
 			final Authentication authentication) throws ServletException, IOException {
+
+		// GPSPRINGSECURITYCORE-240
+		if (SpringSecurityUtils.isAjax(request)) {
+			requestCache.removeRequest(request, response);
+		}
+
 		try {
 			if (SpringSecurityUtils.isAjax(request)) {
 				clearAuthenticationAttributes(request);

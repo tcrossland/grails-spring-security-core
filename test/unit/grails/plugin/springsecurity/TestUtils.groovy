@@ -1,4 +1,4 @@
-/* Copyright 2015 SpringSource.
+/* Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ class TestUtils {
 			authenticatedVoter: new AuthenticatedVoter()]
 
 		def ctx = [getBean: { String name, Class<?> c = null -> beans[name] },
-					  containsBean: { String name -> beans.containsKey(name) } ] as WebApplicationContext
+		           containsBean: { String name -> beans.containsKey(name) } ] as WebApplicationContext
 
 		application.mainContext = ctx
 

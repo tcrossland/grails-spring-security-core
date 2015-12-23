@@ -36,9 +36,12 @@ class SomeController {
    def springSecurityService
 
    def someAction() {
-      def user = springSecurityService.isLoggedIn() ? springSecurityService.loadCurrentUser() : null
+      def user = springSecurityService.isLoggedIn() ?
+         springSecurityService.loadCurrentUser() :
+         null
       if (user) {
-         CreditCard card = CreditCard.findByIdAndUser(params.id as Long, user)
+         CreditCard card = CreditCard.findByIdAndUser(
+            params.id as Long, user)
          ...
       }
       ...
@@ -83,7 +86,8 @@ class SomeController {
    def someAction() {
       def auth = springSecurityService.authentication
       String username = auth.username
-      def authorities = auth.authorities // a Collection of GrantedAuthority
+      // a Collection of GrantedAuthority
+      def authorities = auth.authorities
       boolean authenticated = auth.authenticated
       ...
    }
@@ -106,7 +110,8 @@ class SomeController {
    def someAction() {
       def principal = springSecurityService.principal
       String username = principal.username
-      def authorities = principal.authorities // a Collection of GrantedAuthority
+      // a Collection of GrantedAuthority
+      def authorities = principal.authorities
       boolean enabled = principal.enabled
       ...
    }
@@ -116,7 +121,7 @@ class SomeController {
 h4. encodePassword()
 Hashes a password with the configured hashing scheme. By default the plugin uses bcrypt, but you can configure the scheme with the @grails.plugin.springsecurity.password.algorithm@ attribute in @Config.groovy@. The supported values are 'bcrypt' to use bcrypt, 'pbkdf2' to use [PBKDF2|https://en.wikipedia.org/wiki/PBKDF2], or any message digest algorithm that is supported in your JDK; see [this Java page|https://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html] for the available algorithms.
 {warning}
-You are *strongly* discouraged from using MD5 or SHA-1 algorithms because of their well-known vulnerabilities. You should also use a salt for your passwords, which greatly increases the computational complexity of decrypting passwords if your database gets compromised. See [Salted Passwords|guide:salt].
+You are *strongly* discouraged from using MD5 or SHA-1 algorithms because of their well-known vulnerabilities. You should also use a salt for your passwords, which greatly increases the computational complexity of computing passwords if your database gets compromised. See [Salted Passwords|guide:salt].
 {warning}
 
 Example:
@@ -131,8 +136,9 @@ class PersonController {
 
       params.salt = person.salt
       if (person.password != params.password) {
-         params.password = springSecurityService.encodePassword(password, salt)
-         def salt = ... // e.g. randomly generated using some utility method
+         params.password = springSecurityService.encodePassword(
+            password, salt)
+         def salt = ... // e.g. randomly generated using a utility method
          params.salt = salt
       }
       person.properties = params
@@ -210,7 +216,8 @@ class RequestmapController {
    def save() {
       def requestmapInstance = new Requestmap(params)
       if (!requestmapInstance.save(flush: true)) {
-         render view: 'create', model: [requestmapInstance: requestmapInstance]
+         render view: 'create',
+                model: [requestmapInstance: requestmapInstance]
          return
       }
 
@@ -236,8 +243,9 @@ class UserController {
 
       params.salt = person.salt
       if (params.password) {
-         params.password = springSecurityService.encodePassword(params.password, salt)
-         def salt = ... // e.g. randomly generated using some utility method
+         params.password = springSecurityService.encodePassword(
+            params.password, salt)
+         def salt = ... // e.g. randomly generated using a utility method
          params.salt = salt
       }
       userInstance.properties = params
@@ -247,7 +255,8 @@ class UserController {
       }
 
       if (springSecurityService.loggedIn &&
-             springSecurityService.principal.username == userInstance.username) {
+             springSecurityService.principal.username ==
+                userInstance.username) {
          springSecurityService.reauthenticate userInstance.username
       }
 
