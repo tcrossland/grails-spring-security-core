@@ -1,0 +1,20 @@
+[[s2-create-persistent-token]]
+=== s2-create-persistent-token
+
+.Purpose
+
+Creates a persistent token domain class for storing remember-me cookie information in the database. The general format is:
+
+....
+grails s2-create-persistent-token <classname>
+....
+
+.Example
+
+....
+grails s2-create-persistent-token com.yourapp.PersistentLogin
+....
+
+.Description
+
+This creates the domain class in the specified package, and also registers the name in `grails-app/conf/application.groovy`, along with enabling persistent remember-me.

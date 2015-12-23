@@ -1,4 +1,4 @@
-/* Copyright 2013-2015 SpringSource.
+/* Copyright 2013-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,16 @@
  */
 package grails.plugin.springsecurity
 
-import javax.servlet.http.HttpServletResponse
-
 import org.springframework.security.access.annotation.Secured
+import org.springframework.security.web.RedirectStrategy
+
+import javax.servlet.http.HttpServletResponse
 
 @Secured('permitAll')
 class LogoutController {
+
+	/** Dependency injection for RedirectStrategy. */
+	RedirectStrategy redirectStrategy
 
 	/**
 	 * Index action. Redirects to the Spring security logout uri.
@@ -32,6 +36,7 @@ class LogoutController {
 		}
 
 		// TODO put any pre-logout code here
-		redirect uri: SpringSecurityUtils.securityConfig.logout.filterProcessesUrl // '/j_spring_security_logout'
+		redirectStrategy.sendRedirect request, response, SpringSecurityUtils.securityConfig.logout.filterProcessesUrl // '/logoff'
+		response.flushBuffer()
 	}
 }

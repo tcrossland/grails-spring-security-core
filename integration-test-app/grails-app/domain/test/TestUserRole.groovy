@@ -1,4 +1,4 @@
-/* Copyright 2006-2015 SpringSource.
+/* Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,7 +69,7 @@ class TestUserRole implements Serializable {
 	}
 
 	static TestUserRole create(TestUser user, TestRole role, boolean flush = false) {
-		def instance = new TestUserRole(user, role)
+		def instance = new TestUserRole(user: user, role: role)
 		instance.save(flush: flush, insert: true)
 		instance
 	}

@@ -1,4 +1,4 @@
-/* Copyright 2006-2015 SpringSource.
+/* Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,8 @@ security {
 
 	// 'strict' mode where an explicit grant is required to access any resource;
 	// if true make sure to allow IS_AUTHENTICATED_ANONYMOUSLY or permitAll
-	// for /, /index.gsp, /js/**, /css/**, /images/**, /login/**, /logout/**, /assets/**, etc.
+	// for /, /error, /index, /index.gsp, /shutdown, /assets/**, /**/js/**, /**/css/**, /**/images/**, etc.
+	// (and /login, /login/**, /logout, /logout/** if you're not using annotations)
 	// Also consider using fii.rejectPublicInvocations = true
 	rejectIfNoRule = true
 
@@ -47,7 +48,7 @@ security {
 	roleHierarchy = ''
 
 	// ip restriction filter
-	ipRestrictions = [:]
+	ipRestrictions = []
 
 	// voters
 	voterNames = [] // 'authenticatedVoter', 'roleVoter', 'closureVoter'
@@ -90,9 +91,9 @@ security {
 
 	/** authenticationProcessingFilter */
 	apf {
-		filterProcessesUrl = '/j_spring_security_check'
-		usernameParameter = UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY // 'j_username'
-		passwordParameter = UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_PASSWORD_KEY // 'j_password'
+		filterProcessesUrl = '/login/authenticate'
+		usernameParameter = UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_USERNAME_KEY // 'username'
+		passwordParameter = UsernamePasswordAuthenticationFilter.SPRING_SECURITY_FORM_PASSWORD_KEY // 'password'
 		continueChainBeforeSuccessfulAuthentication = false
 		allowSessionCreation = true
 		postOnly = true
@@ -103,7 +104,7 @@ security {
 	failureHandler {
 		defaultFailureUrl = '/login/authfail?login_error=1'
 		ajaxAuthFailUrl = '/login/authfail?ajax=true'
-		exceptionMappings = [:]
+		exceptionMappings = []
 		useForward = false
 		allowSessionCreation = true
 	}
@@ -156,7 +157,7 @@ security {
 	/** logoutFilter */
 	logout {
 		afterLogoutUrl = '/'
-		filterProcessesUrl = '/j_spring_security_logout'
+		filterProcessesUrl = '/logoff'
 		handlerNames = [] // 'rememberMeServices', 'securityContextLogoutHandler'
 		clearAuthentication = true
 		invalidateHttpSession = true
@@ -194,7 +195,7 @@ security {
 		cookieName = 'grails_remember_me'
 		alwaysRemember = false
 		tokenValiditySeconds = AbstractRememberMeServices.TWO_WEEKS_S // 1209600 -> 14 days
-		parameter = AbstractRememberMeServices.DEFAULT_PARAMETER // '_spring_security_remember_me'
+		parameter = AbstractRememberMeServices.DEFAULT_PARAMETER // 'remember-me'
 		key = 'grailsRocks'
 		persistent = false
 		persistentToken {
@@ -223,14 +224,13 @@ security {
 	// use annotations from Controllers to define security rules
 	// 	change securityConfigType to 'Annotation'
 	controllerAnnotations {
-		staticRules = [:]
+		staticRules = []
 	}
 
-	// use a Map of URL -> roles to define security rules
-	// or List of Maps where the keys are pattern (URL pattern),
+	// List of Maps where the keys are pattern (URL pattern),
 	// access (single token or List, e.g. role name(s)), httpMethod (optional restriction to particular method)
 	// 	to use, change securityConfigType to 'InterceptUrlMap'
-	interceptUrlMap = null
+	interceptUrlMap = []
 
 	/** basic auth */
 	useBasicAuth = false
@@ -253,11 +253,11 @@ security {
 	/** use switchUserProcessingFilter */
 	useSwitchUserFilter = false
 	switchUser {
-		switchUserUrl = '/j_spring_security_switch_user'
-		exitUserUrl = '/j_spring_security_exit_user'
+		switchUserUrl = '/login/impersonate'
+		exitUserUrl = '/logout/impersonate'
 		targetUrl = null // use the authenticationSuccessHandler
 		switchFailureUrl = null // use the authenticationFailureHandler
-		usernameParameter = SwitchUserFilter.SPRING_SECURITY_SWITCH_USERNAME_KEY // j_username
+		usernameParameter = SwitchUserFilter.SPRING_SECURITY_SWITCH_USERNAME_KEY // username
 	}
 
 	// port mappings
@@ -268,7 +268,7 @@ security {
 
 	// secure channel filter (http/https)
 	secureChannel {
-		definition = [:]
+		definition = []
 		useHeaderCheckChannelSecurity = false
 		secureHeaderName = 'X-Forwarded-Proto'
 		secureHeaderValue = 'http'
@@ -328,5 +328,10 @@ security {
 		// one of MODE_THREADLOCAL, MODE_INHERITABLETHREADLOCAL, MODE_GLOBAL,
 		// or the name of a class implementing org.springframework.security.core.context.SecurityContextHolderStrategy
 		strategyName = SecurityContextHolder.MODE_THREADLOCAL
+	}
+
+	gsp {
+		layoutAuth = 'main'
+		layoutDenied = 'main'
 	}
 }

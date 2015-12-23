@@ -1,4 +1,4 @@
-/* Copyright 2006-2015 SpringSource.
+/* Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,41 +14,37 @@
  */
 package grails.plugin.springsecurity
 
+import grails.core.GrailsApplication
 import grails.plugin.springsecurity.userdetails.GrailsUser
 import grails.transaction.Transactional
-
-import javax.servlet.http.HttpServletRequest
-
+import groovy.util.logging.Slf4j
+import org.springframework.security.authentication.AuthenticationTrustResolver
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder as SCH
-import org.springframework.util.Assert
+
+import javax.servlet.http.HttpServletRequest
 
 /**
  * Utility methods.
  *
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
+@Slf4j
 class SpringSecurityService {
 
 	protected static final List<String> NO_SALT = ['bcrypt', 'pbkdf2']
 
 	/** dependency injection for authenticationTrustResolver */
-	def authenticationTrustResolver
+	AuthenticationTrustResolver authenticationTrustResolver
 
 	/** dependency injection for grailsApplication */
-	def grailsApplication
+	GrailsApplication grailsApplication
 
-	/** dependency injection for {@link FilterInvocationSecurityMetadataSource} */
+	/** dependency injection for {@link org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource} */
 	def objectDefinitionSource
 
 	/** dependency injection for the password encoder */
 	def passwordEncoder
-
-	/** dependency injection for userCache */
-	def userCache
-
-	/** dependency injection for userDetailsService */
-	def userDetailsService
 
 	/**
 	 * Get the currently logged in user's principal. If not authenticated and the
@@ -85,7 +81,8 @@ class SpringSecurityService {
 		}
 		else {
 			User.createCriteria().get {
-				eq securityConfig.userLookup.usernamePropertyName, principal.username
+				String usernamePropertyName = securityConfig.userLookup.usernamePropertyName
+				eq usernamePropertyName, principal[usernamePropertyName]
 				cache true
 			}
 		}
@@ -116,7 +113,7 @@ class SpringSecurityService {
 		}
 
 		// load() requires an id, so this only works if there's an id property in the principal
-		Assert.isInstanceOf GrailsUser, principal
+		assert principal instanceof GrailsUser
 
 		getClassForName(securityConfig.userLookup.userDomainClassName).load(currentUserId)
 	}
@@ -146,6 +143,7 @@ class SpringSecurityService {
 	 */
 	void clearCachedRequestmaps() {
 		objectDefinitionSource?.reset()
+		log.trace 'Cleared cached requestmaps'
 	}
 
 	/**
@@ -155,7 +153,9 @@ class SpringSecurityService {
 	void reloadDBRoleHierarchy() {
 		Class roleHierarchyEntryClass = Class.forName(securityConfig.roleHierarchyEntryClassName)
 		roleHierarchyEntryClass.withTransaction {
-			grailsApplication.mainContext.roleHierarchy.hierarchy = roleHierarchyEntryClass.list()*.entry.join('\n')
+			String hierarchy = roleHierarchyEntryClass.list()*.entry.join('\n')
+			log.trace 'Loaded persistent role hierarchy {}', hierarchy
+			grailsApplication.mainContext.roleHierarchy.hierarchy = hierarchy
 		}
 	}
 
@@ -177,8 +177,8 @@ class SpringSecurityService {
 			def requestmaps = findRequestmapsByRole(roleName, conf)
 			for (rm in requestmaps) {
 				String configAttribute = rm."$configAttributePropertyName"
-				if (configAttribute.equals(roleName)) {
-					rm.delete(flush: true)
+				if (configAttribute == roleName) {
+					rm.delete()
 				}
 				else {
 					List parts = configAttribute.split(',')*.trim()
@@ -192,7 +192,9 @@ class SpringSecurityService {
 		// remove the role grant from all users
 		getClassForName(conf.userLookup.authorityJoinClassName).removeAll role
 
-		role.delete(flush: true)
+		role.delete()
+
+		log.trace 'Deleted role {}', role
 	}
 
 	/**
@@ -204,29 +206,30 @@ class SpringSecurityService {
 	 */
 	@Transactional
 	boolean updateRole(role, newProperties) {
-
 		def conf = securityConfig
-		String configAttributePropertyName = conf.requestMap.configAttributeField
 		String authorityFieldName = conf.authority.nameField
 
 		String oldRoleName = role."$authorityFieldName"
 		role.properties = newProperties
 
-		role.save()
-		if (role.hasErrors()) {
+		if (!role.save()) {
 			return false
 		}
 
-		if (useRequestmaps()) {
-			String newRoleName = role."$authorityFieldName"
-			if (newRoleName != oldRoleName) {
-				def requestmaps = findRequestmapsByRole(oldRoleName, conf)
-				for (rm in requestmaps) {
-					rm."$configAttributePropertyName" = rm."$configAttributePropertyName".replace(oldRoleName, newRoleName)
-				}
-			}
-			clearCachedRequestmaps()
+		if (!useRequestmaps()) {
+			return true
 		}
+
+		String newRoleName = role."$authorityFieldName"
+		if (newRoleName == oldRoleName) {
+			return true
+		}
+
+		String configAttributePropertyName = conf.requestMap.configAttributeField
+		for (rm in findRequestmapsByRole(oldRoleName, conf)) {
+			rm."$configAttributePropertyName" = rm."$configAttributePropertyName".replace(oldRoleName, newRoleName)
+		}
+		clearCachedRequestmaps()
 
 		true
 	}

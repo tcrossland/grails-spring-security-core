@@ -1,4 +1,4 @@
-/* Copyright 2006-2015 SpringSource.
+/* Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,21 @@
  */
 package test
 
+import groovy.transform.EqualsAndHashCode
+import groovy.transform.ToString
+
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
+@EqualsAndHashCode(includes='loginName')
+@ToString(includes='loginName', includeNames=true, includePackage=false)
 class TestUser implements Serializable {
 
 	private static final long serialVersionUID = 1
 
 	String loginName
 	String passwrrd
-	boolean enabld
+	boolean enabld = true
 	boolean accountExpired
 	boolean accountLocked
 	boolean passwordExpired
@@ -32,21 +37,6 @@ class TestUser implements Serializable {
 		this()
 		this.loginName = loginName
 		this.passwrrd = passwrrd
-	}
-
-	@Override
-	int hashCode() {
-		loginName?.hashCode() ?: 0
-	}
-
-	@Override
-	boolean equals(other) {
-		is(other) || (other instanceof TestUser && other.loginName == loginName)
-	}
-
-	@Override
-	String toString() {
-		loginName
 	}
 
 	Set<TestRole> getRoles() { TestUserRole.findAllByUser(this)*.role }

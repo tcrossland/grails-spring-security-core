@@ -1,4 +1,4 @@
-/* Copyright 2006-2015 SpringSource.
+/* Copyright 2006-2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,14 @@
  */
 package test
 
+import groovy.transform.EqualsAndHashCode
+import groovy.transform.ToString
+
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
+@EqualsAndHashCode(includes='auth')
+@ToString(includes='auth', includeNames=true, includePackage=false)
 class TestRole implements Serializable {
 
 	private static final long serialVersionUID = 1
@@ -24,24 +29,10 @@ class TestRole implements Serializable {
 	String auth
 	String description
 
-	TestRole(String auth) {
+	TestRole(String auth, String description) {
 		this()
 		this.auth = auth
-	}
-
-	@Override
-	int hashCode() {
-		auth?.hashCode() ?: 0
-	}
-
-	@Override
-	boolean equals(other) {
-		is(other) || (other instanceof TestRole && other.auth == auth)
-	}
-
-	@Override
-	String toString() {
-		auth
+		this.description = description
 	}
 
 	static constraints = {
